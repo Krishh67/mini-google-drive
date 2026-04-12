@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Drive</title>
+    <!-- Modern fonts and Google Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Product+Sans:wght@400;500;700&display=swap" rel="stylesheet" onerror="this.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap'">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <style>
+        :root {
+            /* Google Drive Material You Colors */
+            --primary-bg: #F8FAFD;
+            --sidebar-bg: #F8FAFD;
+            --surface: #FFFFFF;
+            --on-surface: #1F1F1F;
+            --on-surface-variant: #444746;
+            --primary: #0B57D0;
+            --primary-container: #D3E3FD;
+            --on-primary-container: #041E49;
+            --outline: #C7C7C7;
+            --outline-variant: #E0E2E0;
+            --hover: rgba(68, 71, 70, 0.08);
+            --font-family: 'Product Sans', 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-family);
+            background-color: var(--surface);
+            color: var(--on-surface);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar Options --- */
+        .sidebar {
+            width: 256px;
+            background-color: var(--sidebar-bg);
+            padding: 16px 16px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+            margin-bottom: 24px;
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        /* NEW FLOATING ACTION BUTTON */
+        .new-btn-container {
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .new-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--surface);
+            color: var(--on-surface);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 4px 8px rgba(0,0,0,0.05);
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+            width: fit-content;
+        }
+
+        .new-btn:hover {
+            background-color: #F6F8FC;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .new-btn .material-icons-outlined {
+            color: var(--on-surface-variant);
+        }
+
+        /* Hidden file input that triggers on button click */
+        #file-upload-input {
+            display: none;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            border-radius: 24px;
+            color: var(--on-surface-variant);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .nav-item:hover {
+            background-color: var(--hover);
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-container);
+            color: var(--on-primary-container);
+        }
+
+        /* --- Main Content --- */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface);
+            border-top-left-radius: 24px;
+            margin-top: 8px;
+            margin-right: 8px;
+            box-shadow: 0px -1px 8px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid var(--outline-variant);
+        }
+
+        /* --- Header Topbar --- */
+        .header {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 8px 24px;
+            justify-content: space-between;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background-color: #EDF2FC;
+            border-radius: 24px;
+            padding: 0 16px;
+            height: 48px;
+            width: 100%;
+            max-width: 720px;
+            gap: 12px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+            font-size: 16px;
+            color: var(--on-surface);
+            flex-grow: 1;
+        }
+
+        .search-bar .material-icons-outlined {
+            color: var(--on-surface-variant);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--on-surface-variant);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .icon-btn:hover {
+            background-color: var(--hover);
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* --- Drive Grid Area --- */
+        .drive-area {
+            flex-grow: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface-variant);
+            margin-bottom: 16px;
+            margin-top: 24px;
+        }
+        
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 16px;
+        }
+
+        .file-card {
+            background-color: #F4F7FC;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, border 0.2s;
+            border: 1px solid transparent;
+            position: relative;
+        }
+
+        .file-card:hover {
+            background-color: #E8F0FE;
+            border: 1px solid var(--outline-variant);
+        }
+
+        .file-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .file-icon {
+            color: var(--primary);
+            font-size: 36px;
+        }
+
+        .file-more {
+            background: none;
+            border: none;
+            color: var(--on-surface-variant);
+            cursor: pointer;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-more:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--on-surface);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 60%;
+            color: var(--on-surface-variant);
+        }
+        
+        .empty-state .material-icons-outlined {
+            font-size: 120px;
+            color: var(--outline-variant);
+            margin-bottom: 24px;
+        }
+
+        /* Actions at the bottom of the card */
+        .card-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+            border-top: 1px solid var(--outline-variant);
+            padding-top: 12px;
+        }
+
+        .action-link {
+            text-decoration: none;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-link:hover {
+            text-decoration: underline;
+        }
+        
+        .action-link .material-icons-outlined {
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Wrapper -->
+    <div class="sidebar">
+        <!-- Logo -->
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+                <path d="m54.8 45.4-16.1 27.9h32.2l16.1-27.9zm-29.6 0-16.1 27.9 16.1 27.9h32.2l-16.1-27.9zm13.5-23.4-16.1-27.9h-32.2l16.1 27.9z" fill="#000" opacity=".05"/>
+                <path d="m16.1 73.3h32.3l-16.2-27.9z" fill="#1fa463"/>
+                <path d="m16.1 73.3-16.1-27.9 16.2-27.9h32.2z" fill="#3674e8"/>
+                <path d="m48.4 17.5 16.2 27.9-32.3 27.9h-32.3l16.2-27.9z" fill="#ffb02e"/>
+            </svg>
+            My Drive
+        </div>
+
+        <!-- + New Button logic -->
+        <div class="new-btn-container">
+            <button class="new-btn" onclick="document.getElementById('file-upload-input').click()">
+                <span class="material-icons-outlined">add</span>
+                New
+            </button>
+            <form id="upload-form" action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="file" id="file-upload-input" onchange="document.getElementById('upload-form').submit()">
+            </form>
+        </div>
+
+        <!-- Navigation Links -->
+        <a href="#" class="nav-item active">
+            <span class="material-icons-outlined">home</span>
+            Home
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons-outlined">hard_drive</span>
+            My Drive
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons-outlined">people_outline</span>
+            Shared with me
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons-outlined">schedule</span>
+            Recent
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons-outlined">star_outline</span>
+            Starred
+        </a>
+        <a href="#" class="nav-item">
+            <span class="material-icons-outlined">delete_outline</span>
+            Trash
+        </a>
+        
+        <!-- Storage Usage -->
+        <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--outline-variant);">
+            <div style="font-size: 13px; color: var(--on-surface-variant); margin-bottom: 8px;">Storage</div>
+            <div style="width: 100%; background: #E0E2E0; height: 4px; border-radius: 2px;">
+                <div style="width: 15%; background: var(--primary); height: 100%; border-radius: 2px;"></div>
+            </div>
+            <div style="font-size: 12px; color: var(--on-surface-variant); margin-top: 8px;">2.3 GB of 15 GB used</div>
+        </div>
+    </div>
+
+    <!-- Main Content Application Area -->
+    <div class="main-content">
+        <!-- Top App Bar -->
+        <div class="header">
+            <div class="search-bar">
+                <span class="material-icons-outlined">search</span>
+                <input type="text" placeholder="Search in Drive">
+                <span class="material-icons-outlined" style="cursor: pointer;">tune</span>
+            </div>
+            
+            <div class="header-actions">
+                <button class="icon-btn"><span class="material-icons-outlined">help_outline</span></button>
+                <button class="icon-btn"><span class="material-icons-outlined">settings</span></button>
+                <button class="icon-btn"><span class="material-icons-outlined">apps</span></button>
+                <div class="avatar">K</div>
+            </div>
+        </div>
+
+        <!-- Files Display Field -->
+        <div class="drive-area">
+            <div class="section-title">Suggested</div>
+            
+            <!-- Dynamic Files List rendered by Flask -->
+            {% if files %}
+                <div class="files-grid">
+                    {% for file in files %}
+                    <div class="file-card">
+                        <div class="file-header">
+                            <!-- Visual indication of common file types -->
+                            <span class="material-icons-outlined file-icon">
+                                {% if file.filename.endswith('.pdf') %}picture_as_pdf
+                                {% elif file.filename.endswith('.jpg') or file.filename.endswith('.png') or file.filename.endswith('.jpeg') or file.filename.endswith('.gif') %}image
+                                {% elif file.filename.endswith('.docx') or file.filename.endswith('.txt') %}description
+                                {% elif file.filename.endswith('.zip') or file.filename.endswith('.rar') %}folder_zip
+                                {% else %}insert_drive_file{% endif %}
+                            </span>
+                            <button class="file-more"><span class="material-icons-outlined">more_vert</span></button>
+                        </div>
+                        
+                        <div class="file-name" title="{{ file.filename }}">{{ file.filename }}</div>
+                        
+                        <div class="card-actions">
+                            <!-- Direct Download Link -->
+                            <a href="/download/{{ file.id }}" class="action-link" target="_blank">
+                                <span class="material-icons-outlined">download</span> Download
+                            </a>
+                            <!-- Clipboard Copier inline JS -->
+                            <a href="#" class="action-link" onclick="navigator.clipboard.writeText(window.location.origin + '/download/{{ file.id }}'); alert('Link copied to clipboard!'); return false;" style="color: var(--on-surface-variant);">
+                                <span class="material-icons-outlined">link</span> Copy Link
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- What appears when there are no files -->
+                <div class="empty-state">
+                    <span class="material-icons-outlined">cloud_upload</span>
+                    <h2>A place for all of your files</h2>
+                    <p>Click the "New" button to upload documents, images, and more.</p>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</body>
+</html>

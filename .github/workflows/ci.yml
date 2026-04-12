@@ -32,3 +32,7 @@ jobs:
     - name: Check Python Syntax
       run: |
         python -m py_compile app.py
+
+    # Step 5: Build Docker Image
+    - name: Build Docker Image
+      run: docker build -t flask-file-sharing:latest .

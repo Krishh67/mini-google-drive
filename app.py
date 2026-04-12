@@ -36,16 +36,19 @@ def upload_file():
     if file:
         filename = file.filename
         
-        # Save the file
-        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(save_path)
-        
-        # Generate a unique ID and store it
-        file_id = str(uuid.uuid4())
-        files_db[file_id] = filename
-        
-        # Redirect back to the UI which will now refresh and show the new file
-        return redirect(url_for('index'))
+        try:
+            # Save the file
+            save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(save_path)
+            
+            # Generate a unique ID and store it
+            file_id = str(uuid.uuid4())
+            files_db[file_id] = filename
+            
+            # Redirect back to the UI which will now refresh and show the new file
+            return redirect(url_for('index'))
+        except Exception as e:
+            return f"An error occurred during upload: {str(e)}", 500
 
 @app.route('/download/<file_id>', methods=['GET'])
 def download_file(file_id):
@@ -54,7 +57,11 @@ def download_file(file_id):
     if not filename:
         return "File not found.", 404
         
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+    try:
+        return send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+    except Exception as e:
+        return f"An error occurred during download: {str(e)}", 500
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)

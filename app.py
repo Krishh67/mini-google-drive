@@ -62,6 +62,23 @@ def download_file(file_id):
     except Exception as e:
         return f"An error occurred during download: {str(e)}", 500
 
+@app.route('/delete/<file_id>', methods=['POST'])
+def delete_file(file_id):
+    """Deletes the file associated with the unique ID."""
+    filename = files_db.get(file_id)
+    if not filename:
+        return "File not found.", 404
+        
+    try:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+            
+        del files_db[file_id]
+        return redirect(url_for('index'))
+    except Exception as e:
+        return f"An error occurred during deletion: {str(e)}", 500
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
